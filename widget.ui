@@ -6,37 +6,76 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>747</width>
-    <height>547</height>
+    <width>800</width>
+    <height>480</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>8</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>Widget</string>
   </property>
+  <widget class="QLabel" name="imgLabel">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>640</width>
+     <height>480</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::Box</enum>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
   <widget class="QPushButton" name="openCamBtn">
    <property name="geometry">
     <rect>
-     <x>660</x>
-     <y>40</y>
+     <x>680</x>
+     <y>140</y>
      <width>75</width>
      <height>23</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>Open Cam</string>
    </property>
   </widget>
-  <widget class="QLabel" name="pictureLabel">
+  <widget class="QPushButton" name="quitBtn">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>351</width>
-     <height>281</height>
+     <x>690</x>
+     <y>380</y>
+     <width>75</width>
+     <height>23</height>
     </rect>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string>Quit</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="closeCamBtn">
+   <property name="geometry">
+    <rect>
+     <x>680</x>
+     <y>180</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Close Cam</string>
    </property>
   </widget>
  </widget>

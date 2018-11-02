@@ -6,31 +6,39 @@ Widget::Widget(QWidget *parent) :
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
-
-    QHostAddress src_ip = QHostAddress::Any;
-    quint16 src_port = 10086;
-
-    sender.bind(src_ip, src_port);
-
-    dst_ip = QHostAddress("10.200.44.68");
-    dst_port = 10086;
-
-
-    connect(&timer, SIGNAL(timeout()), this, SLOT(timer_out_slot()));
-
+    init();
 }
 
 Widget::~Widget()
 {
-    camera.release();
     delete ui;
 }
 
-void Widget::on_openCamBtn_clicked()
+void Widget::init()
 {
-    camera.open(0);
-    timer.start(33);
-    ui->openCamBtn->setEnabled(false);
+    port = 6666;
+    udp_audio_sender.bind(QHostAddress::Any, port);
+    udp_video_sender.bind(QHostAddress::Any, port + 1);
+    dst_addr.setAddress("10.200.44.67");
+
+    audio_fmt.setSampleRate(8000);
+    audio_fmt.setChannelCount(1);
+    audio_fmt.setSampleSize(16);
+    audio_fmt.setCodec("audio/pcm");
+    audio_fmt.setSampleType(QAudioFormat::SignedInt);
+    audio_fmt.setByteOrder(QAudioFormat::LittleEndian);
+    audio_input = new QAudioInput(audio_fmt, this);
+    audio_input_dev = audio_input->start();
+
+    connect(audio_input_dev, SIGNAL(readyRead()), this, SLOT(audio_read_slot()));
+    connect(&timer, SIGNAL(timeout()), this, SLOT(timer_out_slot()));
+}
+
+void Widget::audio_read_slot()
+{
+    memset(&au, 0, sizeof(au));
+    au.length = audio_input_dev->read(au.data, 1024);
+    udp_audio_sender.writeDatagram((const char *)&au, sizeof(au), dst_addr, port);
 }
 
 void Widget::timer_out_slot()
@@ -38,31 +46,42 @@ void Widget::timer_out_slot()
     Mat frame;
 
     camera.read(frame);
-
     cvtColor(frame, frame, CV_BGR2RGB);
 
-    QImage image((unsigned char*)(frame.data),
+    QImage image((unsigned char *)(frame.data),
                  frame.cols,
                  frame.rows,
                  QImage::Format_RGB888);
 
-    ui->pictureLabel->setPixmap(QPixmap::fromImage(image));
-    ui->pictureLabel->resize(image.width(), image.height());
-
+    ui->imgLabel->setPixmap(QPixmap::fromImage(image));
+    ui->imgLabel->resize(image.width(), image.height());
 
     QByteArray array;
     QBuffer buffer(&array);
 
     image.save(&buffer, "JPEG");
+    QByteArray temp = qCompress(array, 5);
 
-    QByteArray ss = qCompress(array, 5);  // 数据压缩，压缩比为5
-    //QByteArray vv = ss.toBase64();  // 数据加密算法
+    udp_video_sender.writeDatagram(temp, dst_addr, port + 1);
 
-    sender.writeDatagram(ss, dst_ip, dst_port);
 }
 
+void Widget::on_openCamBtn_clicked()
+{
+    ui->openCamBtn->setEnabled(false);
+    //ui->quitBtn->setEnabled(false);
+    camera.open(0);
+    timer.start(30);
+}
 
+void Widget::on_quitBtn_clicked()
+{
+    timer.stop();
+    camera.release();
+    this->close();
+}
 
-
-
-
+void Widget::on_closeCamBtn_clicked()
+{
+    ui->quitBtn->setEnabled(true);
+}

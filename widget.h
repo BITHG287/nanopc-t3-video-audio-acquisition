@@ -2,15 +2,26 @@
 #define WIDGET_H
 
 #include <QWidget>
-#include <QUdpSocket>
 #include <QTimer>
 #include <QImage>
 #include <QPixmap>
+#include <QUdpSocket>
+#include <QHostAddress>
+#include <QAudio>
+#include <QAudioInput>
+#include <QAudioFormat>
+#include <QIODevice>
 #include <QByteArray>
 #include <QBuffer>
+#include <QDebug>
 
 #include <opencv2/opencv.hpp>
 using namespace cv;
+
+struct audio_t{
+    char data[1024];
+    int length;
+};
 
 namespace Ui {
 class Widget;
@@ -24,18 +35,31 @@ public:
     explicit Widget(QWidget *parent = 0);
     ~Widget();
 
-private slots:
-    void on_openCamBtn_clicked();
-    void timer_out_slot();
-
 private:
     Ui::Widget *ui;
 
+    QUdpSocket udp_audio_sender;
+    QUdpSocket udp_video_sender;
+    QHostAddress dst_addr;
+    quint16 port;
+
+    QAudioFormat audio_fmt;
+    QAudioInput *audio_input;
+    QIODevice *audio_input_dev;
+    audio_t au;
+
     VideoCapture camera;
-    QUdpSocket sender;
     QTimer timer;
-    QHostAddress dst_ip;
-    quint16 dst_port;
+
+private slots:
+    void audio_read_slot();
+    void timer_out_slot();
+    void on_quitBtn_clicked();
+    void on_openCamBtn_clicked();
+    void on_closeCamBtn_clicked();
+
+public:
+    void init();
 
 
 };
