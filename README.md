@@ -4,6 +4,7 @@
 2、注意：
 
 （1）发送端也可以使用PC机，我的pc机上，opencv库放在E盘，此时的.pro文件配置为：
+
 INCLUDEPATH += E:/opencv/opencv_qt/include\
                E:/opencv/opencv_qt/include/opencv\
                E:/opencv/opencv_qt/include/opencv2
