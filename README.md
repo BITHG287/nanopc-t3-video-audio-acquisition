@@ -1,4 +1,4 @@
-# nanopc-t3-video-acquisition
+# nanopc-t3-video-audio-acquisition
 1、在友善之臂的nanopc-t3开发板上，使用usb摄像头，进行视频采集、压缩与网络传输
 
 2、注意：
